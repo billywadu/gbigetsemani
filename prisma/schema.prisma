@@ -1,0 +1,1116 @@
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum JenisKelamin {
+  LAK_LAKI
+  PEREMPUAN
+}
+
+enum StatusJemaat {
+  ACTIVE
+  INACTIVE
+  MOVED
+  DECEASED
+  SUSPENDED
+  TAMU
+}
+
+enum StatusBaptis {
+  SUDAH_BAPTIS
+  BELUM_BAPTIS
+}
+
+enum StatusPendaftaran {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum StatusFollowUp {
+  NEW
+  IN_PROGRESS
+  NEED_VISITATION
+  COMPLETED
+}
+
+enum EventKategori {
+  IBADAH_RAYA
+  KOMSEL
+  YOUTH
+  SEMINAR
+  SEKOLAH_MINGGU
+}
+
+enum StatusPeriode {
+  DRAFT
+  CLOSED
+}
+
+enum TipeTransaksi {
+  MASUK
+  KELUAR
+}
+
+enum MetodePembayaran {
+  CASH
+  TRANSFER
+  QRIS
+}
+
+enum JenisDokumen {
+  BAPTIS
+  NIKAH
+  PENYERAHAN_ANAK
+  SAKSI
+  LAINNYA
+}
+
+enum StatusDokumen {
+  DRAFT
+  VERIFIED
+  EXPIRED
+}
+
+enum JenisArsip {
+  LEGALITAS
+  NOTULEN
+  SURAT_MASUK
+  SURAT_KELUAR
+  KONTRAK
+  KEUANGAN_ARCHIVE
+}
+
+enum StatusArsip {
+  AKTIF
+  INAKTIF
+  PERMANEN
+}
+
+enum StatusArtikel {
+  DRAFT
+  PUBLISHED
+
+  @@map("StatusMateri")
+}
+
+enum StatusPernikahan {
+  BELUM_MENIKAH
+  MENIKAH
+  DUDA
+  JANDA
+  BERCERAI
+}
+
+enum Pendidikan {
+  SD
+  SMP
+  SMA
+  D3
+  S1
+  S2
+  S3
+}
+
+enum RelasiKeluarga {
+  SUAMI
+  ISTRI
+  ANAK
+  ORANG_TUA
+  MERTUA
+  CUCU
+  LAINNYA
+}
+
+enum UserRole {
+  SUPER_ADMIN
+  GEMBALA
+  SEKRETARIS
+  BENDAHARA
+  SEKRETARIS_KATEGORIAL
+  BENDAHARA_KATEGORIAL
+  USHER
+  PUBLIC
+}
+
+enum StatusUser {
+  AKTIF
+  NONAKTIF
+  SUSPENDED
+}
+
+model SystemSequence {
+  name       String   @id
+  currentVal Int      @default(0)
+  updatedAt  DateTime @updatedAt
+}
+
+model User {
+  id                  String     @id @default(uuid())
+  username            String     @unique
+  email               String?    @unique
+  nama                String     @map("name")
+  passwordHash        String
+  role                UserRole   @default(SUPER_ADMIN)
+  status              StatusUser @default(AKTIF)
+  isActive            Boolean    @default(true)
+  noHp                String?
+  fotoUrl             String?
+  lastLoginAt         DateTime?
+  lastLoginIp         String?
+  failedLoginAttempts Int        @default(0)
+  lockedUntil         DateTime?
+  lastFailedLoginAt   DateTime?
+
+  // Soft Delete
+  deletedAt           DateTime?
+  deletedBy           String?
+  deletionReason      String?
+
+  createdAt           DateTime   @default(now())
+  updatedAt           DateTime   @updatedAt
+
+  sessions         Session[]
+  auditLogs        AuditLog[]
+  kategorialScopes UserKategorialScope[]
+
+  @@index([username])
+  @@index([email])
+  @@index([role])
+  @@index([status])
+  @@index([deletedAt])
+}
+
+model Session {
+  id        String   @id @default(uuid())
+  token     String   @unique
+  userId    String
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model UserKategorialScope {
+  id           String     @id @default(uuid())
+  userId       String
+  kategorialId String
+  createdAt    DateTime   @default(now())
+
+  user         User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  kategorial   Kategorial @relation(fields: [kategorialId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, kategorialId])
+  @@index([userId])
+  @@index([kategorialId])
+}
+
+model AuditChainState {
+  id        String   @id @default("GLOBAL")
+  lastHash  String
+  updatedAt DateTime @updatedAt
+}
+
+model Jemaat {
+  id                     String           @id @default(uuid())
+  nij                    String?          @unique
+  barcodeCode            String?          @unique
+  nik                    String?
+  nama                   String
+  namaPanggilan          String?
+  jenisKelamin           JenisKelamin
+  tempatLahir            String?
+  tanggalLahir           DateTime?
+  noHp                   String?
+  whatsApp               String?
+  email                  String?
+  alamat                 String?
+  kota                   String           @default("Padang")
+  provinsi               String           @default("Sumatera Barat")
+  kodePos                String?
+  statusJemaat           StatusJemaat     @default(ACTIVE)
+  tanggalBergabung       DateTime?        @default(now())
+  statusBaptis           StatusBaptis     @default(BELUM_BAPTIS)
+  tanggalBaptis          DateTime?
+  statusFollowUp         StatusFollowUp   @default(NEW)
+  statusPernikahan       StatusPernikahan @default(BELUM_MENIKAH)
+  tanggalMenikah         DateTime?
+  pekerjaan              String?
+  pendidikan             Pendidikan?
+  kontakDarurat          String?
+  catatan                String?
+  completenessPercentage Int              @default(0)
+
+  // Relational IDs
+  keluargaId   String?
+  kategorialId  String?
+  komselId     String?
+
+  // Relations
+  keluarga              Keluarga?           @relation("JemaatKeluargaRelation", fields: [keluargaId], references: [id], onDelete: SetNull)
+  keluargaDipimpin      Keluarga[]          @relation("KepalaKeluargaRelation")
+  anggotaKeluargaRecord AnggotaKeluarga?
+  kategorial            Kategorial?         @relation("PrimaryKategorialRelation", fields: [kategorialId], references: [id], onDelete: SetNull)
+  anggotaKategorialList AnggotaKategorial[]
+  komsel                Komsel?             @relation("JemaatKomselRelation", fields: [komselId], references: [id], onDelete: SetNull)
+  koordinatorKomsel     Komsel[]            @relation("KoordinatorKomselRelation")
+  anggotaKomsel         AnggotaKomsel[]     @relation("AnggotaKomselRelation")
+
+  documents   DokumenJemaat[]
+  attendances Attendance[]
+  pelayanRecord Pelayan?
+  pengurusGereja PengurusGereja[]
+
+  // Soft Delete
+  deletedAt      DateTime?
+  deletedBy      String?
+  deletionReason String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([nij])
+  @@index([barcodeCode])
+  @@index([nik])
+  @@index([nama])
+  @@index([noHp])
+  @@index([statusJemaat])
+  @@index([jenisKelamin])
+  @@index([kategorialId])
+  @@index([komselId])
+  @@index([deletedAt])
+}
+
+model Keluarga {
+  id            String   @id @default(uuid())
+  nomorKeluarga String   @unique
+  namaKeluarga  String
+  kepalaId      String?
+  noHp          String?
+  alamat        String?
+  totalAnggota  Int      @default(0)
+
+  // Soft Delete
+  deletedAt      DateTime?
+  deletedBy      String?
+  deletionReason String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  kepalaJemaat    Jemaat?           @relation("KepalaKeluargaRelation", fields: [kepalaId], references: [id], onDelete: SetNull)
+  anggotaJemaat   Jemaat[]          @relation("JemaatKeluargaRelation")
+  anggotaKeluarga AnggotaKeluarga[]
+
+  @@index([nomorKeluarga])
+  @@index([namaKeluarga])
+  @@index([kepalaId])
+  @@index([deletedAt])
+}
+
+model AnggotaKeluarga {
+  id            String         @id @default(uuid())
+  keluargaId    String
+  jemaatId      String         @unique
+  relasi        RelasiKeluarga
+  catatanRelasi String?
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+
+  keluarga Keluarga @relation(fields: [keluargaId], references: [id], onDelete: Cascade)
+  jemaat   Jemaat   @relation(fields: [jemaatId], references: [id], onDelete: Cascade)
+
+  @@index([keluargaId])
+  @@index([jemaatId])
+  @@index([relasi])
+}
+
+model Kategorial {
+  id           String   @id @default(uuid())
+  nama         String   @unique
+  deskripsi    String?
+  isDefault    Boolean  @default(false)
+  totalAnggota Int      @default(0)
+
+  // Soft Delete
+  deletedAt      DateTime?
+  deletedBy      String?
+  deletionReason String?
+
+  // Sub-profile Publik Komunitas Kategorial
+  slug           String?               @unique
+  slogan         String?
+  ayatTema       String?
+  jadwalIbadah   String?
+  instagramUrl   String?
+  bannerUrl      String?
+  isActivePublik Boolean               @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  jemaat            Jemaat[]              @relation("PrimaryKategorialRelation")
+  anggotaKategorial AnggotaKategorial[]
+  pelayan           Pelayan[]             @relation("PelayanKategorialRelation")
+  pelayanKategori   PelayanKategori[]
+  komsel            Komsel[]              @relation("KomselKategorialRelation")
+  arsipGereja       ArsipGereja[]
+  userScopes        UserKategorialScope[]
+  events            Event[]
+  scopeKeuangan     ScopeKeuangan[]
+  pengurusGereja    PengurusGereja[]
+  strukturTiers     StrukturTier[]
+
+  @@index([nama])
+  @@index([slug])
+  @@index([isDefault])
+  @@index([deletedAt])
+}
+
+model AnggotaKategorial {
+  id           String   @id @default(uuid())
+  kategorialId String
+  jemaatId     String
+  catatan      String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  kategorial Kategorial @relation(fields: [kategorialId], references: [id], onDelete: Cascade)
+  jemaat     Jemaat     @relation(fields: [jemaatId], references: [id], onDelete: Cascade)
+
+  @@unique([kategorialId, jemaatId])
+  @@index([kategorialId])
+  @@index([jemaatId])
+}
+
+enum HariPertemuan {
+  SENIN
+  SELASA
+  RABU
+  KAMIS
+  JUMAT
+  SABTU
+  MINGGU
+}
+
+model Komsel {
+  id              String         @id @default(uuid())
+  nama            String         @unique
+  wilayah         String
+  hari            HariPertemuan  @default(RABU)
+  jam             String
+  kategorialId    String?
+  koordinatorId   String?
+
+  // Soft Delete
+  deletedAt      DateTime?
+  deletedBy      String?
+  deletionReason String?
+
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+
+  kategorial      Kategorial?    @relation("KomselKategorialRelation", fields: [kategorialId], references: [id], onDelete: SetNull)
+  koordinator     Jemaat?        @relation("KoordinatorKomselRelation", fields: [koordinatorId], references: [id], onDelete: SetNull)
+  anggota         AnggotaKomsel[]
+  jemaat          Jemaat[]       @relation("JemaatKomselRelation")
+
+  @@index([nama])
+  @@index([wilayah])
+  @@index([kategorialId])
+  @@index([koordinatorId])
+  @@index([deletedAt])
+}
+
+model AnggotaKomsel {
+  id        String   @id @default(uuid())
+  komselId  String
+  jemaatId  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  komsel Komsel @relation(fields: [komselId], references: [id], onDelete: Cascade)
+  jemaat Jemaat @relation("AnggotaKomselRelation", fields: [jemaatId], references: [id], onDelete: Cascade)
+
+  @@unique([komselId, jemaatId])
+  @@index([komselId])
+  @@index([jemaatId])
+}
+
+model DokumenJemaat {
+  id                 String        @id @default(uuid())
+  jemaatId           String
+  judul              String
+  jenisDokumen       JenisDokumen
+  status             StatusDokumen @default(DRAFT)
+  tanggalTerbit      DateTime
+  tanggalKadaluarsa  DateTime?
+  deskripsi          String?
+  cloudinaryPublicId String?
+  fileUrl            String?
+  mimeType           String
+  fileSize           Int           @default(0)
+  uploadedById       String?
+
+  // Soft Delete
+  deletedAt          DateTime?
+  deletedBy          String?
+  deletionReason     String?
+
+  createdAt          DateTime      @default(now())
+  updatedAt          DateTime      @updatedAt
+
+  jemaat             Jemaat        @relation(fields: [jemaatId], references: [id], onDelete: Cascade)
+
+  @@index([jemaatId])
+  @@index([jenisDokumen])
+  @@index([status])
+  @@index([deletedAt])
+  @@index([createdAt])
+}
+
+model Event {
+  id              String        @id @default(uuid())
+  namaEvent       String
+  kategori        EventKategori
+  
+  // Waktu Pelaksanaan
+  tanggalMulai    DateTime      @default(now())
+  tanggalSelesai  DateTime?
+  
+  // Jendela Waktu Presensi (Check-in Window)
+  presensiBuka    DateTime?
+  presensiTutup   DateTime?
+  
+  // Lokasi & Alamat
+  namaLokasi      String?
+  alamatLokasi    String?
+  lokasi          String        @default("Main Sanctuary")
+  
+  // Media Poster / Thumbnail
+  thumbnailUrl    String?
+  
+  // Metadata Acara
+  deskripsi       String?
+  manualHeadcount Int?          @default(0)
+  
+  // Legacy compatibility
+  tanggal         DateTime      @default(now())
+
+  // Soft Delete
+  deletedAt       DateTime?
+  deletedBy       String?
+  deletionReason  String?
+
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  kategorialId    String?
+  kategorial      Kategorial?   @relation(fields: [kategorialId], references: [id], onDelete: SetNull)
+
+  attendances     Attendance[]
+
+  @@index([tanggalMulai])
+  @@index([tanggal])
+  @@index([kategori])
+  @@index([kategorialId])
+  @@index([deletedAt])
+}
+
+model Attendance {
+  id        String   @id @default(uuid())
+  eventId   String
+  jemaatId  String
+  scannedAt DateTime @default(now())
+  scannedBy String?
+  notes     String?
+
+  event     Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  jemaat    Jemaat   @relation(fields: [jemaatId], references: [id], onDelete: Cascade)
+
+  @@unique([eventId, jemaatId])
+  @@index([eventId])
+  @@index([jemaatId])
+  @@index([scannedAt])
+}
+
+model AuditLog {
+  id           String   @id @default(uuid())
+  timestamp    DateTime @default(now())
+  actor        String
+  userId       String?
+  ip           String   @default("127.0.0.1")
+  action       String
+  entity       String
+  entityId     String
+  stateChange  String?
+  previousHash String
+  currentHash  String
+
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([entityId])
+  @@index([action])
+  @@index([timestamp])
+}
+
+// ─────────────────────────────────────────────
+// MODUL 5 — DATA PELAYAN & STRUKTUR KATEGORI
+// ─────────────────────────────────────────────
+
+model KategoriPelayanan {
+  id        String   @id @default(uuid())
+  nama      String   @unique
+  deskripsi String?
+
+  // Soft Delete
+  deletedAt      DateTime?
+  deletedBy      String?
+  deletionReason String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  pelayanKategori PelayanKategori[]
+
+  @@index([nama])
+  @@index([deletedAt])
+}
+
+model Pelayan {
+  id             String  @id @default(uuid())
+  jemaatId       String  @unique
+  kategorialId   String?
+  deskripsiTugas String?
+
+  // Soft Delete
+  deletedAt      DateTime?
+  deletedBy      String?
+  deletionReason String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  jemaat          Jemaat            @relation(fields: [jemaatId], references: [id], onDelete: Cascade)
+  kategorial      Kategorial?       @relation("PelayanKategorialRelation", fields: [kategorialId], references: [id], onDelete: SetNull)
+  kategoriPelayanan PelayanKategori[]
+
+  @@index([jemaatId])
+  @@index([kategorialId])
+  @@index([deletedAt])
+}
+
+model PelayanKategori {
+  id                  String   @id @default(uuid())
+  pelayanId           String
+  kategoriPelayananId String
+  kategorialId        String?
+
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+
+  pelayan           Pelayan           @relation(fields: [pelayanId], references: [id], onDelete: Cascade)
+  kategoriPelayanan KategoriPelayanan @relation(fields: [kategoriPelayananId], references: [id], onDelete: Cascade)
+  kategorial        Kategorial?       @relation(fields: [kategorialId], references: [id], onDelete: Cascade)
+
+  @@unique([pelayanId, kategoriPelayananId, kategorialId])
+  @@index([pelayanId])
+  @@index([kategoriPelayananId])
+  @@index([kategorialId])
+}
+
+model PendaftaranJemaat {
+  id               String            @id @default(uuid())
+  nama             String
+  namaPanggilan    String?
+  jenisKelamin     JenisKelamin
+  tempatLahir      String?
+  tanggalLahir     DateTime?
+  noHp             String?
+  whatsApp         String?
+  email            String?
+  alamat           String?
+  statusPernikahan   StatusPernikahan? @default(BELUM_MENIKAH)
+  pekerjaan          String?
+  status             StatusPendaftaran @default(PENDING)
+  rejectionReason    String?
+  jemaatId           String?
+
+  // Family Batch Registration Fields
+  tipePendaftaran     String?           @default("PRIBADI")
+  namaKeluarga        String?
+  nomorKk             String?
+  kkFileUrl           String?
+  kkFileSize          Int?
+  anggotaKeluargaJson String?
+  keluargaId          String?
+
+  // Soft Delete
+  deletedAt        DateTime?
+  deletedBy        String?
+  deletionReason   String?
+
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+
+  @@index([status])
+  @@index([createdAt])
+  @@index([nama])
+  @@index([noHp])
+  @@index([email])
+  @@index([deletedAt])
+}
+
+model ScopeKeuangan {
+  id          String   @id @default(uuid())
+  code        String   @unique
+  name        String
+  description String?
+  kategorialId String?
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  kategorial  Kategorial?       @relation(fields: [kategorialId], references: [id], onDelete: SetNull)
+  laporan     LaporanKeuangan[]
+
+  @@index([code])
+  @@index([kategorialId])
+}
+
+model LaporanKeuangan {
+  id               String              @id @default(uuid())
+  scopeId          String
+  bulan            Int
+  tahun            Int
+  saldoAwal        Decimal             @default(0) @db.Decimal(15, 2)
+  totalPemasukan   Decimal             @default(0) @db.Decimal(15, 2)
+  totalPengeluaran Decimal             @default(0) @db.Decimal(15, 2)
+  saldoAkhir       Decimal             @default(0) @db.Decimal(15, 2)
+  status           StatusPeriode       @default(DRAFT)
+  reopenReason     String?
+  closedAt         DateTime?
+  closedBy         String?
+
+  // Soft Delete
+  deletedAt        DateTime?
+  deletedBy        String?
+  deletionReason   String?
+
+  createdAt        DateTime            @default(now())
+  updatedAt        DateTime            @updatedAt
+
+  scope            ScopeKeuangan       @relation(fields: [scopeId], references: [id], onDelete: Cascade)
+  transaksi        TransaksiKeuangan[]
+
+  @@unique([scopeId, bulan, tahun])
+  @@index([scopeId])
+  @@index([tahun, bulan])
+  @@index([status])
+  @@index([deletedAt])
+}
+
+model TransaksiKeuangan {
+  id               String            @id @default(uuid())
+  laporanId        String
+  nomorReferensi   String            @unique
+  tipe             TipeTransaksi
+  kategori         String
+  nominal          Decimal           @db.Decimal(15, 2)
+  metodePembayaran MetodePembayaran  @default(CASH)
+  catatan          String?
+  tanggal          DateTime          @default(now())
+
+  // Soft Delete
+  deletedAt        DateTime?
+  deletedBy        String?
+  deletionReason   String?
+
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+
+  laporan          LaporanKeuangan   @relation(fields: [laporanId], references: [id], onDelete: Cascade)
+
+  @@index([laporanId])
+  @@index([tanggal])
+  @@index([tipe])
+  @@index([nomorReferensi])
+  @@index([deletedAt])
+}
+
+model ArsipGereja {
+  id                 String        @id @default(uuid())
+  judul              String
+  jenisArsip         JenisArsip
+  kategorialId       String?
+  tanggalDokumen     DateTime
+  status             StatusArsip   @default(AKTIF)
+  deskripsi          String?
+  cloudinaryPublicId String?
+  fileUrl            String?
+  mimeType           String
+  fileSize           Int           @default(0)
+  uploadedById       String?
+
+  // Soft Delete
+  deletedAt          DateTime?
+  deletedBy          String?
+  deletionReason     String?
+
+  createdAt          DateTime      @default(now())
+  updatedAt          DateTime      @updatedAt
+
+  kategorial         Kategorial?   @relation(fields: [kategorialId], references: [id], onDelete: SetNull)
+
+  @@index([jenisArsip])
+  @@index([status])
+  @@index([kategorialId])
+  @@index([deletedAt])
+  @@index([tanggalDokumen])
+}
+
+model KategoriArtikel {
+  id             String           @id @default(uuid())
+  nama           String           @unique
+  slug           String           @unique
+  totalArtikel   Int              @default(0) @map("totalMateri")
+
+  // Soft Delete
+  deletedAt      DateTime?
+  deletedBy      String?
+  deletionReason String?
+
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+
+  artikel        Artikel[]
+
+  @@map("KategoriMateri")
+  @@index([slug])
+  @@index([deletedAt])
+}
+
+model Artikel {
+  id                 String          @id @default(uuid())
+  judul              String
+  slug               String          @unique
+  kategoriId         String
+  penulis            String          @map("pembicara")
+  tanggal            DateTime
+  status             StatusArtikel   @default(DRAFT)
+  thumbnailUrl       String?
+  cloudinaryPublicId String?
+  ringkasan          String          @db.Text
+  konten             String          @db.Text
+  totalDilihat       Int             @default(0)
+  uploadedById       String?
+
+  // Soft Delete
+  deletedAt          DateTime?
+  deletedBy          String?
+  deletionReason     String?
+
+  createdAt          DateTime        @default(now())
+  updatedAt          DateTime        @updatedAt
+
+  kategori           KategoriArtikel @relation(fields: [kategoriId], references: [id], onDelete: Restrict)
+
+  @@map("MateriRenungan")
+  @@index([slug])
+  @@index([status])
+  @@index([kategoriId])
+  @@index([tanggal])
+  @@index([deletedAt])
+  @@index([status, deletedAt])
+  @@index([kategoriId, status])
+}
+
+model SiteSetting {
+  id        String   @id @default(uuid())
+  key       String   @unique
+  value     Json
+  updatedAt DateTime @updatedAt
+  updatedBy String?
+
+  @@index([key])
+}
+
+enum KategoriDoa {
+  KESEHATAN
+  KELUARGA
+  PEKERJAAN
+  ROHANI
+  KEUANGAN
+  LAINNYA
+}
+
+enum StatusDoa {
+  BARU
+  SEDANG_DIDOAKAN
+  SELESAI
+  TERJAWAB
+}
+
+enum PrivasiDoa {
+  RAHASIA_PASTORAL
+  TIM_DOA_PUBLIK
+}
+
+model PermohonanDoa {
+  id              String       @id @default(uuid())
+  namaPemohon     String
+  isAnonim        Boolean      @default(false)
+  kontakWa        String?
+  kategori        KategoriDoa  @default(LAINNYA)
+  privasi         PrivasiDoa   @default(TIM_DOA_PUBLIK)
+  isiDoa          String       @db.Text
+  status          StatusDoa    @default(BARU)
+  catatanPastoral String?      @db.Text
+  didoakanOleh    String?
+  didoakanAt      DateTime?
+  ipAddress       String?
+
+  // Soft Delete
+  deletedAt       DateTime?
+  deletedBy       String?
+  deletionReason  String?
+
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+
+  @@index([status])
+  @@index([kategori])
+  @@index([privasi])
+  @@index([createdAt])
+  @@index([deletedAt])
+}
+
+enum StatusSurat {
+  DRAFT
+  DIARSIPKAN
+  DITERBITKAN
+}
+
+enum KategoriSurat {
+  UNDANGAN
+  KETERANGAN
+  REKOMENDASI
+  TUGAS
+  PEMBERITAHUAN
+  BAPTIS
+  PENYERAHAN_ANAK
+  PERNIKAHAN
+  LAINNYA
+}
+
+model SuratResmi {
+  id                String        @id @default(uuid())
+  nomorSurat        String
+  perihal           String
+  lampiran          String?       @default("-")
+  tanggalSurat      DateTime      @default(now())
+  tempatSurat       String        @default("Jakarta")
+  kategori          KategoriSurat @default(LAINNYA)
+  status            StatusSurat   @default(DRAFT)
+
+  // Data Tujuan
+  tujuanKepada      String        @db.Text
+  tujuanDi          String        @default("Di Tempat")
+
+  // Isi Surat
+  salamPembuka      String        @default("Salam dalam kasih Kristus,")
+  paragrafPembuka   String        @db.Text
+  subJudul          String?
+  poinIsi           Json          // Array of objects/strings: [{ id: "1", text: "...", bold: false }]
+  paragrafPenutup   String        @db.Text
+
+  // Konfigurasi Kop Surat
+  modeLogo          String        @default("SATU_LOGO") // "SATU_LOGO" | "DUA_LOGO"
+  logoKiriUrl       String?
+  logoKananUrl      String?
+  kopNama           String
+  kopSub            String?
+  kopBadanHukum     String?
+  kopAlamat         String?
+  kopKontak         String?
+  garisKopStyle     String        @default("DOUBLE") // "DOUBLE" | "SINGLE" | "GOLD" | "NAVY"
+  garisKopColor     String        @default("#0f172a")
+
+  // Tanda Tangan & Stempel
+  salamPenutup      String        @default("Dalam KasihNya,")
+  namaInstansiTtd   String?
+  formatTtd         String        @default("DUA_PEJABAT") // "SATU_PEJABAT" | "DUA_PEJABAT" | "TIGA_PEJABAT"
+  signatories       Json          // Array of: [{ roleKey: "ketua", jabatan: "Ketua", nama: "...", ttdUrl: "...", nomorInduk: "..." }]
+  tampilkanStempel  Boolean       @default(true)
+  stempelUrl        String?
+  posisiStempel     String        @default("CENTER_OVERLAP") // "CENTER_OVERLAP" | "LEFT" | "RIGHT"
+
+  // Lampiran Tambahan
+  adaLampiran       Boolean       @default(false)
+  judulLampiran     String?
+  isiLampiran       String?       @db.Text
+  gambarLampiranUrl String?
+
+  // Audit & Soft Delete
+  createdById       String?
+  createdByName     String?
+  deletedAt         DateTime?
+  deletedBy         String?
+  deletionReason    String?
+
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
+
+  @@index([nomorSurat])
+  @@index([status])
+  @@index([kategori])
+  @@index([tanggalSurat])
+  @@index([deletedAt])
+  @@index([status, deletedAt])
+}
+
+// ─────────────────────────────────────────────
+// MODUL 10 — PROFIL GEREJA, SEJARAH & STRUKTUR ORGANISASI
+// ─────────────────────────────────────────────
+
+model ProfilGereja {
+  id              String   @id @default("MAIN")
+  namaGereja      String   @default("GBI Getsemani")
+  sinode          String   @default("Gereja Bethel Indonesia")
+  tagline         String   @default("Gereja Yang Membawa Pemulihan & Transformasi Hidup")
+  ayatEmas        String   @default("Matius 28:19-20")
+  isiAyatEmas     String?  @db.Text
+  
+  // Kontak & Alamat
+  alamat          String   @default("Jl. Raya Getsemani No. 123")
+  telepon         String?
+  email           String?
+  whatsapp        String?
+  instagram       String?
+  youtube         String?
+  googleMapsUrl   String?  @db.Text
+
+  // Konten Filosofi & Doktrin (Markdown / Rich Text)
+  visi            String?  @db.Text
+  misi            String?  @db.Text // JSON string / Markdown list
+  nilaiInti       String?  @db.Text // JSON string / Markdown
+  pengakuanIman   String?  @db.Text
+  sejarahLengkap  String?  @db.Text // Rich Text Content (HTML/Markdown)
+
+  // Media Banner / Foto Resmi
+  fotoGedungUrl   String?
+  fotoGembalaUrl  String?
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  updatedBy       String?
+}
+
+model MilestoneSejarah {
+  id          String   @id @default(uuid())
+  tahun       Int
+  judul       String
+  deskripsi   String   @db.Text
+  fotoUrl     String?
+  urutan      Int      @default(0)
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([tahun])
+  @@index([urutan])
+}
+
+enum KategoriPengurus {
+  PIMPINAN_UTAMA
+  BPH_MAJELIS
+  KATEGORIAL
+  DEPARTEMEN_PELAYANAN
+}
+
+enum ScopeStruktur {
+  UTAMA
+  KATEGORIAL
+}
+
+enum LayoutStyleTier {
+  FEATURED
+  GRID
+}
+
+model StrukturTier {
+  id           String          @id @default(uuid())
+  lingkup      ScopeStruktur   @default(UTAMA)
+  kategorialId String?
+  nama         String          // Misal: "Dewan Pembina", "Badan Pengurus Harian", "Core Team Youth"
+  deskripsi    String?         // Keterangan singkat mengenai tugas tingkat ini
+  urutan       Int             @default(1) // 1, 2, 3, 4, 5... urutan tampil di halaman
+  layoutStyle  LayoutStyleTier @default(GRID) // FEATURED (kartu potret besar) atau GRID (kartu standar)
+
+  createdAt    DateTime        @default(now())
+  updatedAt    DateTime        @updatedAt
+
+  kategorial   Kategorial?     @relation(fields: [kategorialId], references: [id], onDelete: Cascade)
+  pengurusList PengurusGereja[]
+
+  @@index([lingkup])
+  @@index([kategorialId])
+  @@index([urutan])
+}
+
+model PengurusGereja {
+  id              String           @id @default(uuid())
+  jemaatId        String
+  kategori        KategoriPengurus @default(DEPARTEMEN_PELAYANAN)
+  kategorialId    String?
+  tierId          String?
+  
+  // Jabatan & Profil Publik
+  jabatan         String           // Misal: "Gembala Sidang", "Ketua Majelis", "Koordinator Musik"
+  gelar           String?          // Misal: "M.Th", "S.Kom", "B.A"
+  namaOverride    String?          // Jika ingin menggunakan nama panggilan/resmi tertentu
+  level           Int              @default(3) // 1: Pimpinan Utama, 2: BPH/Majelis, 3: Koordinator, 4: Anggota Tim
+  urutan          Int              @default(0) // Sorting order
+  
+  // Foto & Bio Khusus Publik
+  fotoPublikUrl   String?          // Foto studio/jas resmi khusus website publik
+  bioRingkas      String?          @db.Text // Kutipan singkat / bio pelayanan
+  emailPublik     String?
+  teleponPublik   String?
+
+  // Status & Visibilitas Publik
+  isActivePublik  Boolean          @default(true)
+  periodeAwal     Int?             // Tahun mulai misal 2024
+  periodeAkhir    Int?             // Tahun selesai misal 2026
+
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+
+  // Relations
+  jemaat          Jemaat           @relation(fields: [jemaatId], references: [id], onDelete: Cascade)
+  kategorial      Kategorial?      @relation(fields: [kategorialId], references: [id], onDelete: SetNull)
+  tier            StrukturTier?    @relation(fields: [tierId], references: [id], onDelete: SetNull)
+
+  @@index([jemaatId])
+  @@index([kategori])
+  @@index([kategorialId])
+  @@index([tierId])
+  @@index([level])
+  @@index([urutan])
+  @@index([isActivePublik])
+}
+
+
+
+
+
+
+
