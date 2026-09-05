@@ -619,19 +619,42 @@ export default function LandingPageSettingsPage() {
                 />
               </div>
 
-              <div className='space-y-2'>
-                <Label htmlFor='hero-badge'>Teks Badge Sambutan</Label>
-                <Input
-                  id='hero-badge'
-                  value={config.hero.badgeText}
-                  onChange={(e) =>
-                    setConfig((prev) => ({
-                      ...prev,
-                      hero: { ...prev.hero, badgeText: e.target.value },
-                    }))
-                  }
-                  placeholder='Selamat Datang di Rumah Tuhan'
-                />
+              {/* Badge Sambutan Toggle & Input */}
+              <div className='space-y-3 p-4 border rounded-xl bg-card'>
+                <div className='flex items-center justify-between'>
+                  <div className='space-y-0.5'>
+                    <Label htmlFor='hero-badge-switch' className='font-bold text-sm'>Badge Sambutan (Pill Header)</Label>
+                    <p className='text-xs text-muted-foreground'>
+                      Tampilkan atau sembunyikan teks badge melayang di atas judul utama.
+                    </p>
+                  </div>
+                  <Switch
+                    id='hero-badge-switch'
+                    checked={config.hero.badgeEnabled ?? true}
+                    onCheckedChange={(val) =>
+                      setConfig((prev) => ({
+                        ...prev,
+                        hero: { ...prev.hero, badgeEnabled: val },
+                      }))
+                    }
+                  />
+                </div>
+                {(config.hero.badgeEnabled ?? true) && (
+                  <div className='space-y-2 pt-2 border-t'>
+                    <Label htmlFor='hero-badge' className='text-xs'>Teks Badge Sambutan</Label>
+                    <Input
+                      id='hero-badge'
+                      value={config.hero.badgeText}
+                      onChange={(e) =>
+                        setConfig((prev) => ({
+                          ...prev,
+                          hero: { ...prev.hero, badgeText: e.target.value },
+                        }))
+                      }
+                      placeholder='Selamat Datang di Rumah Tuhan'
+                    />
+                  </div>
+                )}
               </div>
 
               <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>

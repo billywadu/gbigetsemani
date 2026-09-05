@@ -40,7 +40,8 @@ export type TopBarConfig = z.infer<typeof topBarConfigSchema>
 
 // ── 3. Hero Video Section Schema ───────────────────────────────────────
 export const heroConfigSchema = z.object({
-  badgeText: z.string().default('Kepatuhan UU Perlindungan Data Pribadi (UU PDP No. 27/2022)'),
+  badgeEnabled: z.boolean().default(true),
+  badgeText: z.string().default('Selamat Datang'),
   titlePrefix: z.string().default('Gereja Yang Membawa'),
   titleHighlight: z.string().default('Pemulihan Hidup'),
   rotatingWords: z.array(z.string()).default([
@@ -359,7 +360,8 @@ export const DEFAULT_LANDING_PAGE_CONFIG: LandingPageConfig = {
     rekeningDetail: 'Bank Central Asia (BCA) - No. Rek: 1234567890 a/n GBI Getsemani Padang',
   },
   hero: {
-    badgeText: 'Kepatuhan UU Perlindungan Data Pribadi (UU PDP No. 27/2022)',
+    badgeEnabled: true,
+    badgeText: 'Selamat Datang',
     titlePrefix: 'Gereja Yang Membawa',
     titleHighlight: 'Pemulihan Hidup',
     rotatingWords: ['Pemulihan', 'Transformasi', 'Pengharapan', 'Kasih Karunia'],

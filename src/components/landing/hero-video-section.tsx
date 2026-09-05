@@ -58,7 +58,7 @@ export function HeroVideoSection({ config }: HeroVideoSectionProps) {
       {/* ── 3. Content Container ─────────────────────────────────────── */}
       <div className='relative z-20 max-w-4xl mx-auto px-4 sm:px-6 py-20 md:py-28 text-center space-y-6 sm:space-y-8'>
         {/* Compliance / Welcome Badge */}
-        {config.badgeText && (
+        {config.badgeEnabled !== false && config.badgeText && (
           <div className='inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-white/90 text-xs sm:text-[13px] font-medium shadow-lg animate-fade-in'>
             <Sparkles className='size-3.5 text-amber-300 shrink-0' />
             <span>{config.badgeText}</span>
