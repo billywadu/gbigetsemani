@@ -76,10 +76,6 @@ export function QuickActionGrid({ config }: QuickActionGridProps) {
         <div className='relative z-10'>
           {/* Header Title & Subtitle */}
           <div className='text-center max-w-2xl mx-auto mb-5 sm:mb-8 md:mb-10'>
-            <div className='inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-semibold mb-2 sm:mb-3'>
-              <Sparkles className='size-3.5' />
-              <span>Akses Cepat</span>
-            </div>
             <h2 className='text-xl sm:text-3xl md:text-4xl font-extrabold tracking-tight text-foreground font-serif'>
               {config.sectionTitle}
             </h2>
