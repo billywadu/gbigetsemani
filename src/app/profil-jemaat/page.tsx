@@ -182,7 +182,7 @@ export default function ProfilJemaatVerifikasiPage() {
   }
 
   return (
-    <div className='dark min-h-svh bg-background text-foreground flex flex-col font-sans'>
+    <div className='min-h-svh bg-background text-foreground flex flex-col font-sans'>
       {/* Official Public Navigation Header */}
       <PublicHeader initialProfile={profile} />
 

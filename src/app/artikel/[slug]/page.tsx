@@ -144,7 +144,7 @@ export default async function ArtikelPublicDetailPage({ params }: ArtikelPagePro
   const { sanitizedHtml, headings } = sanitizeAndFormatArticleHtml(artikel.konten)
 
   return (
-    <div className='dark min-h-svh bg-background text-foreground flex flex-col'>
+    <div className='min-h-svh bg-background text-foreground flex flex-col'>
       {/* Official Public Navigation Header */}
       <PublicHeader initialProfile={profile} />
 

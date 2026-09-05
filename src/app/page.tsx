@@ -174,7 +174,7 @@ export default async function PublicLandingPage() {
   }
 
   return (
-    <div className='dark min-h-svh bg-background text-foreground flex flex-col'>
+    <div className='min-h-svh bg-background text-foreground flex flex-col'>
       {/* 1. Unified Public Header with Top Bar Info */}
       <PublicHeader initialProfile={profile} initialConfig={config} />
 

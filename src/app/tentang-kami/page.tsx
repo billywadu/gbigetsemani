@@ -70,7 +70,7 @@ export default function TentangKamiPublicPage() {
   }
 
   return (
-    <div className='dark min-h-screen bg-background text-foreground flex flex-col selection:bg-primary selection:text-primary-foreground'>
+    <div className='min-h-screen bg-background text-foreground flex flex-col selection:bg-primary selection:text-primary-foreground'>
       {/* ── Unified Top Public Header ───────────────────────────────── */}
       <PublicHeader />
 

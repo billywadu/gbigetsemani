@@ -295,7 +295,7 @@ export default function PublicDaftarPage() {
   }
 
   return (
-    <div className='dark min-h-svh bg-background text-foreground flex flex-col'>
+    <div className='min-h-svh bg-background text-foreground flex flex-col'>
       <PublicHeader initialProfile={profile} />
 
       <main className='flex-1 p-3 sm:p-6 max-w-xl mx-auto w-full space-y-4'>

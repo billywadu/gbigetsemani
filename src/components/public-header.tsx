@@ -35,6 +35,7 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { getAppProfileAction } from '@/actions/app-profile'
 import { getLandingPageConfigAction } from '@/actions/landing-page'
+import { ThemeSwitch } from '@/components/theme-switch'
 import { AppProfileConfig, DEFAULT_APP_PROFILE_CONFIG } from '@/lib/validations/app-profile'
 import { LandingPageConfig, DEFAULT_LANDING_PAGE_CONFIG } from '@/lib/validations/landing-page'
 
@@ -255,6 +256,11 @@ export function PublicHeader({ initialProfile, initialConfig }: PublicHeaderProp
 
       {/* ── Right Actions ────────────────────────────────────────────── */}
       <div className='flex items-center gap-2 shrink-0'>
+        {/* Theme Switcher for Desktop */}
+        <div className='hidden sm:flex items-center'>
+          <ThemeSwitch />
+        </div>
+
         {/* ── Mobile Hamburger Menu ──────────────────────────────────── */}
 
         <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
@@ -415,6 +421,12 @@ export function PublicHeader({ initialProfile, initialConfig }: PublicHeaderProp
                   </div>
                   <ChevronRight className='size-3.5 opacity-50' />
                 </Link>
+              </div>
+
+              {/* Group 4: Pengaturan Tema Tampilan */}
+              <div className='pt-3 border-t flex items-center justify-between px-2'>
+                <span className='text-xs font-medium text-foreground'>Tema Tampilan</span>
+                <ThemeSwitch />
               </div>
             </div>
 

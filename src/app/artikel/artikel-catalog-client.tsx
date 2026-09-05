@@ -89,7 +89,7 @@ export function ArtikelCatalogClient({ initialProfile }: ArtikelCatalogClientPro
   const churchName = profile?.namaResmi || profile?.namaSingkat || 'Gereja'
 
   return (
-    <div className='dark min-h-screen bg-linear-to-b from-background via-muted/20 to-background text-foreground flex flex-col'>
+    <div className='min-h-screen bg-linear-to-b from-background via-muted/20 to-background text-foreground flex flex-col'>
       {/* Official Public Navigation Bar */}
       <PublicHeader initialProfile={profile} />
 
