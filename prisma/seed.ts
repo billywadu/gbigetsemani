@@ -76,7 +76,26 @@ async function main() {
     },
   })
 
-  console.log(`✅ Production database cleaned. Single Super Admin active: [${superAdmin.username}] (${superAdmin.role})`)
+  // 5. Upsert Permanent System Default Kategorial "Umum"
+  const defaultKategorial = await prisma.kategorial.upsert({
+    where: { nama: 'Umum' },
+    update: {
+      isDefault: true,
+      deletedAt: null,
+      deletedBy: null,
+      deletionReason: null,
+    },
+    create: {
+      nama: 'Umum',
+      deskripsi: 'Kategori jemaat umum bawaan sistem. Seluruh jemaat baru secara otomatis masuk ke kategori ini.',
+      isDefault: true,
+      totalAnggota: 0,
+      slug: 'umum',
+      isActivePublik: true,
+    },
+  })
+
+  console.log(`✅ Production database cleaned. Single Super Admin: [${superAdmin.username}] (${superAdmin.role}), Default Kategorial: [${defaultKategorial.nama}]`)
 }
 
 main()

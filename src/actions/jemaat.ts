@@ -19,6 +19,7 @@ import {
   JemaatFilterParams,
 } from '@/lib/validations/jemaat'
 import { requireStaffSession } from '@/lib/security/auth-guard'
+import { getOrCreateDefaultKategorial } from '@/actions/kategorial'
 import {
   createAuditLog,
   calculateJemaatCompleteness,
@@ -280,6 +281,13 @@ export async function createJemaatAction(input: CreateJemaatInput) {
       const atomicNij = await getNextAtomicNij(tx)
       const barcodeCode = await generateUniqueBarcodeCode(tx)
 
+      // Automatic fallback to system default "Umum" if no kategorial is selected
+      let resolvedKategorialId = validated.kategorialId || null
+      if (!resolvedKategorialId) {
+        const defaultKat = await getOrCreateDefaultKategorial(tx)
+        resolvedKategorialId = defaultKat?.id || null
+      }
+
       const created = await tx.jemaat.create({
         data: {
           nij: atomicNij,
@@ -310,10 +318,36 @@ export async function createJemaatAction(input: CreateJemaatInput) {
           catatan: validated.catatan || null,
           completenessPercentage,
           keluargaId: validated.keluargaId || null,
-          kategorialId: validated.kategorialId || null,
+          kategorialId: resolvedKategorialId,
           komselId: validated.komselId || null,
         },
       })
+
+      // Link to AnggotaKategorial if kategorialId is resolved
+      if (resolvedKategorialId) {
+        await tx.anggotaKategorial.upsert({
+          where: {
+            kategorialId_jemaatId: {
+              kategorialId: resolvedKategorialId,
+              jemaatId: created.id,
+            },
+          },
+          update: {},
+          create: {
+            kategorialId: resolvedKategorialId,
+            jemaatId: created.id,
+            catatan: 'Otomatis terdaftar pada Kategori Default',
+          },
+        })
+
+        const totalKategorialMembers = await tx.anggotaKategorial.count({
+          where: { kategorialId: resolvedKategorialId },
+        })
+        await tx.kategorial.update({
+          where: { id: resolvedKategorialId },
+          data: { totalAnggota: totalKategorialMembers },
+        })
+      }
 
       // SHA-256 Audit Log Entry
       await createAuditLog(

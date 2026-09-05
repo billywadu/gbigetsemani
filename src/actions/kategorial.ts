@@ -55,6 +55,9 @@ async function getKategorialActor() {
  */
 export async function getKategorialListAction(params?: KategorialFilterParams) {
   try {
+    // Ensure permanent system-default "Umum" category exists
+    await getOrCreateDefaultKategorial(prisma)
+
     const actor = await getKategorialActor()
     const validated = kategorialFilterSchema.parse(params || {})
     const { search, statusHapus = 'ACTIVE', page, pageSize } = validated
