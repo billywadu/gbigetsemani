@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { ArrowRight, Calendar, HeartHandshake, ShieldCheck, Sparkles, Play } from 'lucide-react'
+import { ArrowRight, UserPlus, HeartHandshake, ShieldCheck, Sparkles, Play } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { HeroConfig } from '@/lib/validations/landing-page'
@@ -94,9 +94,9 @@ export function HeroVideoSection({ config }: HeroVideoSectionProps) {
               size='lg'
               className='h-12 px-6 sm:px-8 rounded-full bg-linear-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-slate-950 font-bold shadow-xl shadow-amber-500/20 hover:scale-[1.02] active:scale-[0.98] transition-all text-sm sm:text-base'
             >
-              <Link href={config.ctaDaftarUrl || '#jadwal'} className='gap-2.5'>
-                <Calendar className='size-4' />
-                <span>{config.ctaDaftarText || 'Jadwal Ibadah Minggu'}</span>
+              <Link href={config.ctaDaftarUrl || '/daftar'} className='gap-2.5'>
+                <UserPlus className='size-4' />
+                <span>{config.ctaDaftarText || 'Daftar Jemaat'}</span>
               </Link>
             </Button>
           )}

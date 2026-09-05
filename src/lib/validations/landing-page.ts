@@ -62,8 +62,8 @@ export const heroConfigSchema = z.object({
     .default(
       'https://images.unsplash.com/photo-1438232992991-995b7058bbb3?auto=format&fit=crop&w=1920&q=80'
     ),
-  ctaDaftarText: z.string().default('Jadwal Ibadah Minggu'),
-  ctaDaftarUrl: z.string().default('#jadwal'),
+  ctaDaftarText: z.string().default('Daftar Jemaat'),
+  ctaDaftarUrl: z.string().default('/daftar'),
   ctaDaftarEnabled: z.boolean().default(true),
   ctaVerifikasiText: z.string().default('Permohonan Doa'),
   ctaVerifikasiUrl: z.string().default('/doa'),
@@ -369,8 +369,8 @@ export const DEFAULT_LANDING_PAGE_CONFIG: LandingPageConfig = {
       'https://assets.mixkit.co/videos/preview/mixkit-hands-raised-in-a-concert-or-worship-event-42354-large.mp4',
     videoPosterUrl:
       'https://images.unsplash.com/photo-1438232992991-995b7058bbb3?auto=format&fit=crop&w=1920&q=80',
-    ctaDaftarText: 'Jadwal Ibadah Minggu',
-    ctaDaftarUrl: '#jadwal',
+    ctaDaftarText: 'Daftar Jemaat',
+    ctaDaftarUrl: '/daftar',
     ctaDaftarEnabled: true,
     ctaVerifikasiText: 'Permohonan Doa',
     ctaVerifikasiUrl: '/doa',
