@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useEffect, useCallback } from 'react'
+import React, { useState, useEffect, useCallback, Suspense } from 'react'
 import Link from 'next/link'
 import { useParams, useRouter, useSearchParams } from 'next/navigation'
 import {
@@ -71,7 +71,7 @@ import { formatWhatsAppMessage } from '@/lib/whatsapp-helpers'
 import { getAppProfileAction } from '@/actions/app-profile'
 import { toast } from 'sonner'
 
-export default function JemaatDetailPage() {
+function JemaatDetailContent() {
   const params = useParams()
   const router = useRouter()
   const searchParams = useSearchParams()
@@ -1985,5 +1985,19 @@ export default function JemaatDetailPage() {
         </AlertDialogContent>
       </AlertDialog>
     </div>
+  )
+}
+
+export default function JemaatDetailPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className='flex h-96 items-center justify-center'>
+          <Loader2 className='size-8 animate-spin text-primary' />
+        </div>
+      }
+    >
+      <JemaatDetailContent />
+    </Suspense>
   )
 }

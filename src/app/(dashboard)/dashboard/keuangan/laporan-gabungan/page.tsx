@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useEffect, useCallback } from 'react'
+import React, { useState, useEffect, useCallback, Suspense } from 'react'
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
 import {
@@ -96,7 +96,7 @@ function escapeHtml(str: string): string {
     .replace(/'/g, '&#039;')
 }
 
-export default function LaporanGabunganPage() {
+function LaporanGabunganContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
 
@@ -2005,5 +2005,19 @@ export default function LaporanGabunganPage() {
         </AlertDialogContent>
       </AlertDialog>
     </div>
+  )
+}
+
+export default function LaporanGabunganPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className='flex h-96 items-center justify-center'>
+          <Loader2 className='size-8 animate-spin text-primary' />
+        </div>
+      }
+    >
+      <LaporanGabunganContent />
+    </Suspense>
   )
 }

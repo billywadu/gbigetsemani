@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useEffect, useCallback } from 'react'
+import React, { useState, useEffect, useCallback, Suspense } from 'react'
 import Link from 'next/link'
 import { useParams, useRouter, useSearchParams } from 'next/navigation'
 import {
@@ -143,7 +143,7 @@ function escapeHtml(str: string): string {
     .replace(/'/g, '&#039;')
 }
 
-export default function ScopeKasDetailPage() {
+function ScopeKasDetailContent() {
   const params = useParams()
   const router = useRouter()
   const searchParams = useSearchParams()
@@ -3570,5 +3570,19 @@ export default function ScopeKasDetailPage() {
         </AlertDialogContent>
       </AlertDialog>
     </div>
+  )
+}
+
+export default function ScopeKasDetailPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className='flex h-96 items-center justify-center'>
+          <Loader2 className='size-8 animate-spin text-primary' />
+        </div>
+      }
+    >
+      <ScopeKasDetailContent />
+    </Suspense>
   )
 }
