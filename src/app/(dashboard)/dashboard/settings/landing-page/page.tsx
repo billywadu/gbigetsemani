@@ -85,7 +85,7 @@ import {
 } from '@/lib/validations/landing-page'
 import { toast } from 'sonner'
 
-export const SETTINGS_SECTIONS = [
+const SETTINGS_SECTIONS = [
   { value: 'sections', label: 'Urutan Seksi', icon: Layers, color: 'text-primary' },
   { value: 'hero', label: 'Hero Video Banner', icon: Video, color: 'text-sky-500' },
   { value: 'quickActions', label: 'Tombol Cepat (Quick Actions)', icon: Sliders, color: 'text-amber-500' },
