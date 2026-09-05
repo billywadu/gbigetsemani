@@ -35,17 +35,28 @@ export function HeroVideoSection({ config }: HeroVideoSectionProps) {
 
   return (
     <section className='relative w-full min-h-[520px] sm:min-h-[600px] md:min-h-[680px] lg:min-h-[740px] flex items-center justify-center overflow-hidden bg-black text-white'>
-      {/* ── 1. HTML5 Looping Video Background ────────────────────────── */}
-      <video
-        autoPlay
-        loop
-        muted
-        playsInline
-        poster={config.videoPosterUrl}
-        className='absolute inset-0 w-full h-full object-cover object-center scale-105 filter brightness-[0.70] contrast-[1.05]'
-      >
-        <source src={config.videoUrl} type='video/mp4' />
-      </video>
+      {/* ── 1. HTML5 Looping Video Background / Poster ────────────────── */}
+      {config.videoUrl ? (
+        <video
+          autoPlay
+          loop
+          muted
+          playsInline
+          poster={config.videoPosterUrl || undefined}
+          className='absolute inset-0 w-full h-full object-cover object-center scale-105 filter brightness-[0.70] contrast-[1.05]'
+        >
+          <source src={config.videoUrl} type='video/mp4' />
+        </video>
+      ) : config.videoPosterUrl ? (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img
+          src={config.videoPosterUrl}
+          alt='Hero Background'
+          className='absolute inset-0 w-full h-full object-cover object-center scale-105 filter brightness-[0.70] contrast-[1.05]'
+        />
+      ) : (
+        <div className='absolute inset-0 bg-slate-950' />
+      )}
 
       {/* ── 2. Cinematic Gradient Overlays ───────────────────────────── */}
       {/* Top soft vignette */}
