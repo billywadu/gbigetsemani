@@ -52,8 +52,8 @@ export function HeroVideoSection({ config }: HeroVideoSectionProps) {
       <div className='absolute inset-0 bg-linear-to-b from-black/80 via-black/40 to-black/85 z-10' />
       {/* Radial soft glow for text focus */}
       <div className='absolute inset-0 bg-radial from-transparent via-black/20 to-black/90 z-10' />
-      {/* Bottom transition gradient to seamlessly blend with next section */}
-      <div className='absolute bottom-0 inset-x-0 h-32 bg-linear-to-t from-background via-background/40 to-transparent z-10' />
+      {/* Bottom subtle cinematic vignette to keep video contrast solid */}
+      <div className='absolute bottom-0 inset-x-0 h-32 bg-linear-to-t from-black/90 via-black/40 to-transparent z-10' />
 
       {/* ── 3. Content Container ─────────────────────────────────────── */}
       <div className='relative z-20 max-w-4xl mx-auto px-4 sm:px-6 py-20 md:py-28 text-center space-y-6 sm:space-y-8'>
