@@ -68,10 +68,10 @@ export function QuickActionGrid({ config }: QuickActionGridProps) {
 
   return (
     <section className='relative z-30 max-w-6xl mx-auto px-3.5 sm:px-6 -mt-8 sm:-mt-16 mb-10 sm:mb-14'>
-      <div className='relative overflow-hidden rounded-2xl sm:rounded-3xl bg-linear-to-br from-card via-card/95 to-muted/50 border p-4.5 sm:p-8 md:p-10 shadow-xl shadow-black/5'>
-        {/* Background ambient lighting */}
-        <div className='absolute -top-24 -right-24 size-96 bg-primary/10 rounded-full blur-3xl pointer-events-none' />
-        <div className='absolute -bottom-24 -left-24 size-96 bg-amber-500/10 rounded-full blur-3xl pointer-events-none' />
+      <div className='relative overflow-hidden rounded-2xl sm:rounded-3xl bg-card border p-4.5 sm:p-8 md:p-10 shadow-xl shadow-black/5'>
+        {/* Background subtle ambient accent glows */}
+        <div className='absolute -top-24 -right-24 size-96 bg-primary/5 rounded-full blur-3xl pointer-events-none' />
+        <div className='absolute -bottom-24 -left-24 size-96 bg-amber-500/5 rounded-full blur-3xl pointer-events-none' />
 
         <div className='relative z-10'>
           {/* Header Title & Subtitle */}
@@ -101,7 +101,7 @@ export function QuickActionGrid({ config }: QuickActionGridProps) {
                   rel={isExternal ? 'noopener noreferrer' : undefined}
                   className={cn(
                     'group relative rounded-xl sm:rounded-2xl border transition-all duration-300 active:scale-[0.98]',
-                    'bg-card/80 hover:bg-card border-border/70 hover:border-primary/40 hover:shadow-md hover:-translate-y-0.5',
+                    'bg-muted/30 hover:bg-muted/60 border-border/70 hover:border-primary/40 hover:shadow-md hover:-translate-y-0.5',
                     // Mobile: Horizontal List Row
                     'flex flex-row items-center text-left p-3.5 gap-3.5',
                     // Desktop: Vertical Centered Card
