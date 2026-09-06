@@ -1491,7 +1491,7 @@ function ScopeKasDetailContent() {
                 <button
                   type='button'
                   onClick={() => router.push(`/dashboard/keuangan/scope/${scopeCodeParam}`)}
-                  className='hover:text-foreground transition-colors font-medium text-left truncate max-w-[130px] sm:max-w-[200px] hover:underline'
+                  className='hover:text-foreground transition-colors font-medium text-left truncate max-w-32.5 sm:max-w-50 hover:underline'
                   title={displayScopeName}
                 >
                   {displayScopeName}
@@ -1502,7 +1502,7 @@ function ScopeKasDetailContent() {
                 </span>
               </>
             ) : (
-              <span className='font-semibold text-foreground truncate max-w-[180px] sm:max-w-none' title={displayScopeName}>
+              <span className='font-semibold text-foreground truncate max-w-45 sm:max-w-none' title={displayScopeName}>
                 {displayScopeName}
               </span>
             )}
@@ -1793,7 +1793,7 @@ function ScopeKasDetailContent() {
                       </div>
 
                       <div className='overflow-x-auto pb-2'>
-                        <div className={`h-[280px] sm:h-[320px] ${multiChartData.length > 5 ? 'min-w-[480px] sm:min-w-full' : 'w-full'}`}>
+                        <div className={`h-70 sm:h-80 ${multiChartData.length > 5 ? 'min-w-120 sm:min-w-full' : 'w-full'}`}>
                           <ResponsiveContainer width='100%' height='100%'>
                             <ComposedChart
                               data={multiChartData}
@@ -1978,7 +1978,7 @@ function ScopeKasDetailContent() {
 
               return (
                 <div className='overflow-x-auto'>
-                  <Table className='min-w-[680px]'>
+                  <Table className='min-w-170'>
                     <TableHeader className='bg-muted/40'>
                       <TableRow className='text-[11px]'>
                         <TableHead className='w-10 text-center'>
@@ -2446,7 +2446,7 @@ function ScopeKasDetailContent() {
 
                   return (
                     <div className='overflow-x-auto'>
-                      <Table className='min-w-[720px]'>
+                      <Table className='min-w-180'>
                         <TableHeader className='bg-muted/40'>
                           <TableRow className='text-[11px]'>
                             <TableHead className='w-12 text-center'>No</TableHead>
@@ -3070,7 +3070,7 @@ function ScopeKasDetailContent() {
                   placeholder='Contoh: Revisi pencatatan persembahan khusus yang belum dimasukkan...'
                   value={reopenReason}
                   onChange={(e) => setReopenReason(e.target.value)}
-                  className='text-xs min-h-[80px]'
+                  className='text-xs min-h-20'
                   required
                 />
               </div>

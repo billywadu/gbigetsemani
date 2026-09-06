@@ -34,7 +34,7 @@ export function HeroVideoSection({ config }: HeroVideoSectionProps) {
   }, [words.length])
 
   return (
-    <section className='relative w-full min-h-[520px] sm:min-h-[600px] md:min-h-[680px] lg:min-h-[740px] flex items-center justify-center overflow-hidden bg-black text-white'>
+    <section className='relative w-full min-h-130 sm:min-h-150 md:min-h-170 lg:min-h-185 flex items-center justify-center overflow-hidden bg-black text-white'>
       {/* ── 1. HTML5 Looping Video Background / Poster ────────────────── */}
       {config.videoUrl ? (
         <video

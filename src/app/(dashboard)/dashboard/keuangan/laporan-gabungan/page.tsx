@@ -1259,7 +1259,7 @@ function LaporanGabunganContent() {
       </div>
 
       {loading ? (
-        <div className='flex items-center justify-center min-h-[350px] text-muted-foreground gap-2 text-sm'>
+        <div className='flex items-center justify-center min-h-87.5 text-muted-foreground gap-2 text-sm'>
           <Loader2 className='size-5 animate-spin text-primary' /> Mengompilasi laporan keuangan gabungan...
         </div>
       ) : reportData ? (
@@ -1403,7 +1403,7 @@ function LaporanGabunganContent() {
 
                     {/* Scrollable Container on Mobile */}
                     <div className='overflow-x-auto pb-2'>
-                      <div className='h-[290px] sm:h-[330px]' style={{ minWidth: Math.max(520, barChartData.length * 110) }}>
+                      <div className='h-72.5 sm:h-82.5' style={{ minWidth: Math.max(520, barChartData.length * 110) }}>
                         <ResponsiveContainer width='100%' height='100%'>
                           <ComposedChart
                             data={barChartData}
@@ -1495,7 +1495,7 @@ function LaporanGabunganContent() {
                 ) : (
                   /* ── DONUT CHART: PROPORSI SALDO KAS GEREJA ── */
                   <div className='flex flex-col md:flex-row items-center gap-6 py-1'>
-                    <div className='h-[220px] sm:h-[260px] w-full md:w-1/2 flex items-center justify-center shrink-0'>
+                    <div className='h-55 sm:h-65 w-full md:w-1/2 flex items-center justify-center shrink-0'>
                       <ResponsiveContainer width='100%' height='100%'>
                         <PieChart>
                           <Pie
@@ -1639,10 +1639,10 @@ function LaporanGabunganContent() {
 
             <CardContent className='p-0'>
               <div className='overflow-x-auto'>
-                <Table className='min-w-[750px]'>
+                <Table className='min-w-187.5'>
                   <TableHeader>
                     <TableRow className='hover:bg-transparent border-b bg-muted/10'>
-                      <TableHead className='w-[40px] px-3 text-center'>
+                      <TableHead className='w-10 px-3 text-center'>
                         <Checkbox
                           checked={isAllSelected}
                           onCheckedChange={(c) => handleSelectAll(!!c)}
@@ -1656,7 +1656,7 @@ function LaporanGabunganContent() {
                       <TableHead className='px-4 text-xs font-semibold text-end'>Arus Kas Bersih</TableHead>
                       <TableHead className='px-4 text-xs font-semibold text-end'>Saldo Akhir</TableHead>
                       <TableHead className='px-4 text-xs font-semibold text-center'>Status</TableHead>
-                      <TableHead className='w-[100px] px-4 text-end'>Aksi</TableHead>
+                      <TableHead className='w-25 px-4 text-end'>Aksi</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -1982,7 +1982,7 @@ function LaporanGabunganContent() {
                     placeholder='Contoh: Penyesuaian nota transaksi operasional yang terlambat dilaporkan...'
                     value={bulkReopenReason}
                     onChange={(e) => setBulkReopenReason(e.target.value)}
-                    className='text-xs min-h-[60px]'
+                    className='text-xs min-h-15'
                     required
                   />
                 </div>
